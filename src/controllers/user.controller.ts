@@ -3,12 +3,14 @@ import { User } from '../types/db.types';
 import { UserService } from '../services/user.service';
 import { BaseController } from './base.controller';
 import { DatabaseError, ValidationError } from '../middlewares/error.middleware';
+import { Container } from '../config/container';
 
 export class UserController extends BaseController<User> {
   private userService: UserService;
 
   constructor() {
-    const service = new UserService();
+    const container = Container.getInstance();
+    const service = container.getService<UserService>('UserService');
     super(service);
     this.userService = service;
   }

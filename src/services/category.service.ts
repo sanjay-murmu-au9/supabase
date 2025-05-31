@@ -3,12 +3,8 @@ import { CategoryRepository } from '../repositories/category.repository';
 import { GenericService } from './generic.service';
 
 export class CategoryService extends GenericService<Category> {
-  private categoryRepository: CategoryRepository;
-
-  constructor() {
-    const repository = new CategoryRepository();
-    super(repository);
-    this.categoryRepository = repository;
+  constructor(private categoryRepository: CategoryRepository) {
+    super(categoryRepository);
   }
 
   async getByName(name: string): Promise<Category | null> {

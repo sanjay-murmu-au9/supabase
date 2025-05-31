@@ -1,31 +1,26 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseModel } from '../types/db.types';
 import { BaseRepository } from './base.repository';
-import { getSupabaseClient, initializeDatabase } from '../config/database';
+import { getSupabaseClient } from '../config/database';
 import { DatabaseError } from '../middlewares/error.middleware';
 
 export class SupabaseRepository<T extends BaseModel> implements BaseRepository<T> {
   protected readonly tableName: string;
-  private client: SupabaseClient | null = null;
+  protected client: SupabaseClient | null = null;
 
   constructor(tableName: string) {
     this.tableName = tableName;
   }
 
   protected async getClient(): Promise<SupabaseClient> {
-    try {
-      if (!this.client) {
-        try {
-          this.client = getSupabaseClient();
-        } catch (error) {
-          // If client not initialized, try to initialize it
-          this.client = await initializeDatabase();
-        }
+    if (!this.client) {
+      try {
+        this.client = getSupabaseClient();
+      } catch (error) {
+        throw new DatabaseError(`Failed to get database client: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
-      return this.client;
-    } catch (error: any) {
-      throw new DatabaseError(`Failed to get database client: ${error.message}`);
     }
+    return this.client;
   }
 
   async findAll(): Promise<T[]> {
